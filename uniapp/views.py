@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Project, Task
 from .serializers import ProjectSerializer, TaskSerializer
 from .permissions import IsAdmin, IsTeacher, IsStudent
+from django.shortcuts import get_object_or_404
 
 class ProjectListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher | IsAdmin]
@@ -25,20 +26,20 @@ class ProjectDetailAPIView(APIView):
     permission_classes = [IsAuthenticated, IsTeacher | IsAdmin]
 
     def get(self, request, pk):
-        project = Project.objects.get(pk=pk)
+        project = get_object_or_404(Project, pk=pk)
         serializer = ProjectSerializer(project)
         return Response(serializer.data)
 
     def put(self, request, pk):
-        project = Project.objects.get(pk=pk)
-        serializer = ProjectSerializer(project, data=request.data)
+        project = get_object_or_404(Project, pk=pk)
+        serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        project = Project.objects.get(pk=pk)
+        project = get_object_or_404(Project, pk=pk)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -61,13 +62,12 @@ class TaskDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
-        task = Task.objects.get(pk=pk)
+        task = get_object_or_404(Task, pk=pk)
         serializer = TaskSerializer(task)
         return Response(serializer.data)
 
     def put(self, request, pk):
-        task = Task.objects.get(pk=pk)
-        print(111111111111111111111111111)
+        task = get_object_or_404(Task, pk=pk)
 
         # STUDENT: Can only update stage or attachments, and only for their own task
         if request.user.role == 'student':
@@ -93,7 +93,7 @@ class TaskDetailAPIView(APIView):
 
 
     def delete(self, request, pk):
-        task = Task.objects.get(pk=pk)
+        task = get_object_or_404(Task, pk=pk)
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
