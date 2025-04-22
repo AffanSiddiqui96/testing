@@ -98,7 +98,7 @@ class TaskDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class TeacherDashboardAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsTeacher]
+    permission_classes = [IsAuthenticated, IsTeacher | IsAdmin]
 
     def get(self, request):
         projects = Project.objects.all()
@@ -109,7 +109,7 @@ class TeacherDashboardAPIView(APIView):
         })
 
 class StudentDashboardAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsStudent]
+    permission_classes = [IsAuthenticated, IsStudent | IsAdmin]
 
     def get(self, request):
         tasks = Task.objects.filter(assigned_student=request.user)
